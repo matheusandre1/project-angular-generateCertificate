@@ -1,4 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+body{
+  font-family: "Inter", sans-serif !important;
+  font-optical-sizing: auto !important;
+}
 .content-title{
  height: 60px;
  gap: 4px;
