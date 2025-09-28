@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SecoundaryButtonComponent } from '../../_components/secoundary-button/secoundary-button.component';
 import { PrimaryButtonComponent } from "../../_components/primary-button/primary-button.component";
 import { FormsModule, NgModel} from '@angular/forms';
 import { NgStyle, CommonModule } from '@angular/common';
 import { Certificado } from '../../Interfaces/certficado';
+import { CertificadoService } from '../../_services/certificado.service';
+import { v4 as uuidv4 } from 'uuid';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-certificado-form',
   imports: [SecoundaryButtonComponent, PrimaryButtonComponent, FormsModule, NgStyle, CommonModule],
@@ -11,9 +15,12 @@ import { Certificado } from '../../Interfaces/certficado';
   styleUrl: './certificado-form.component.css'
 })
 export class CertificadoFormComponent {
+  constructor(private certificadoService: CertificadoService, private router: Router){}
 
+  @ViewChild('form') form!: NgForm
   atividade: string = "";
   certificado : Certificado = {
+    id: '',
     atividades: [],
     nome: '',
     dataEmissao: ''
@@ -29,6 +36,9 @@ export class CertificadoFormComponent {
   }
 
   adicionarAtividade(){
+    if(this.atividade.length === 0){
+      return;
+    }
     this.certificado.atividades.push(this.atividade);
     this.atividade = '';
   }
@@ -41,9 +51,11 @@ export class CertificadoFormComponent {
     if(!this.formValido()){
       return;
     }
+    this.certificado.id = uuidv4();
+    this.certificado.dataEmissao = this.dataAtual();
+    this.certificadoService.adicionarCertificados(this.certificado)
 
-    this.certificado.dataEmissao = this.dataAtual()
-    console.log(this.certificado)
+    this.router.navigate(['certificados', this.certificado.id])
   }
 
   dataAtual(){
@@ -55,5 +67,14 @@ export class CertificadoFormComponent {
     const diatual:string = `${dia}/${mes}/${ano}`;
 
     return diatual;
+  }
+
+  estadoInicial(): Certificado{
+    return{
+      id: '',
+    atividades: [],
+    nome: '',
+    dataEmissao: ''
+    }
   }
 }
